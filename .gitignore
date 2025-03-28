@@ -1,2 +1,3 @@
+hd60M.img
 bochs.out
-boot/mbr.bin
+boot/*.bin
