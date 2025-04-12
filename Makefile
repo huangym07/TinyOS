@@ -19,6 +19,11 @@ mbr2img: $(BOOT_DIR)/mbr.bin
 $(BOOT_DIR)/loader.bin: $(BOOT_DIR)/loader.S
 	nasm -I $(INCLUDE_DIR) -f bin -o $@ $<
 loader2img: $(BOOT_DIR)/loader.bin
-	dd if=$(BOOT_DIR)/loader.bin of=$(ROOT_DIR)/hd60M.img bs=512 count=1 seek=2 conv=notrunc
+	dd if=$(BOOT_DIR)/loader.bin of=$(ROOT_DIR)/hd60M.img bs=512 count=4 seek=2 conv=notrunc
 	
 .PHONY: loader2img
+
+
+bochs_start: mbr2img loader2img
+	bochs -f bochsrc.disk
+.PHONY: bochs_start

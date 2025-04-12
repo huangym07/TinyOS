@@ -49,7 +49,7 @@ section mbr vstart=0x7c00
 ; 加载 bootloader 到内存
     mov eax, LOADER_START_SECTOR    ; 待加载的起始扇区的 LBA 地址
     mov bx, LOADER_BASE_ADDR        ; 写入的地址
-    mov cx, 1                       ; 待读入扇区数
+    mov cx, 4                       ; 待读入扇区数
     call .rd_disk_m_16               ; 调用 rd_risk_m_16
 
     jmp LOADER_BASE_ADDR            ; 跳转到 bootloader
@@ -62,6 +62,7 @@ section mbr vstart=0x7c00
                                     ; bx    数据写入的内存地址
                                     ; cx    读取扇区个数  
     mov esi, eax        ; 备份 eax
+    mov di, cx          ; 备份 cx
 
 ; 设置要读取的扇区数
     mov dx, 0x1f2 
@@ -74,15 +75,17 @@ section mbr vstart=0x7c00
     mov dx, 0x1f3
     out dx, al
 
-    shr eax, 8
+    mov cx, 8
+
+    shr eax, cl
     mov dx, 0x1f4
     out dx, al
 
-    shr eax, 8
+    shr eax, cl
     mov dx, 0x1f5
     out dx, al
 
-    shr eax, 8
+    shr eax, cl
     and al, 0x0F        ; 保留最高 4 位 LBA 地址
     or al, 0xE0         ; 1110 表示读取主设备以及使用 LBA 地址
     mov dx, 0x1f6
@@ -103,6 +106,7 @@ section mbr vstart=0x7c00
 
 ; 读取数据并写入目标地址
     mov ax, 256         ; 每次读入 16b(2B)，1 个扇区 512B 需要读入 256 次
+    mov cx, di
     mul cx              ; cx 读入扇区数
     mov cx, ax          ; 需要读入次数 
 
